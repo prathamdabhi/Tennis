@@ -116,12 +116,12 @@
         if (ballx < 0) {
           if (ballY > paddel1Y && ballY < paddel1Y + paddelHeight) {
             ballSpeedX = -ballSpeedX;
+            paddleHitSound.play().catch((error) => {
+              console.error("Audio play error:", error);
             let deltay = ballY - (paddel1Y + paddelHeight / 2);
             ballSpeedY = deltay * 0.35;
 
             // Play the hit sound
-            paddleHitSound.play().catch((error) => {
-              console.error("Audio play error:", error);
             });
           } else {
             player2Score++;
@@ -133,12 +133,12 @@
         if (ballx > canvas.width) {
           if (ballY > paddel2Y && ballY < paddel2Y + paddelHeight) {
             ballSpeedX = -ballSpeedX;
+            paddleHitSound.play().catch((error) => {
+              console.error("Audio play error:", error);
             let deltay = ballY - (paddel2Y + paddelHeight / 2);
             ballSpeedY = deltay * 0.35;
 
             // Play the hit sound
-            paddleHitSound.play().catch((error) => {
-              console.error("Audio play error:", error);
             });
           } else {
             player1Score++;
