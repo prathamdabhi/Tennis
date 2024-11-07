@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body,
+      html {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+      }
+      #gameCanvas {
+        border-radius: 15px;
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+        background-color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
+      let canvas;
+      let canvasContext;
+      let ballx = 50;
+      let ballY = 50;
+      let ballSpeedX = 10;
+      let ballSpeedY = 4;
+      let paddel1Y = 250;
+      let paddel2Y = 250;
+      const paddelHeight = 90;
+      const paddleThickness = 10;
+      let player1Score = 0;
+      let player2Score = 0;
+      const winningScore = 3;
+      let showScreenWin = false;
+
+      // Load the paddle hit sound
+      const paddleHitSound = new Audio('./cricket_bat_sound.mp3');
+      paddleHitSound.load();  // Preload the sound
+      
+      // Error handling for audio
+      paddleHitSound.onerror = () => {
+        console.error("Audio file failed to load. Check the file path.");
+      };
+
+      window.onload = function() {
+        canvas = document.getElementById('gameCanvas');
+        canvasContext = canvas.getContext('2d');
+
+        let framPerSecond = 30;
+        setInterval(function () {
+          move();
+          draw();
+        }, 1000 / framPerSecond);
+
+        canvas.addEventListener('mousedown', function(e) {
+          if(showScreenWin) {
+            player1Score = 0;
+            player2Score = 0;
+            showScreenWin = false;
+          }
+        });
+
+        canvas.addEventListener('mousemove', function(e) {
+          let mousePos = mousePosition(e);
+          paddel1Y = mousePos.y - (paddelHeight / 2);
+        });
+      };
+
+      function computermove() {
+        var paddle2YCenter = paddel2Y + (paddelHeight / 2);
+        if(paddle2YCenter < ballY - 35) {
+          paddel2Y += 6;
+        } else if(paddle2YCenter > ballY + 35) {
+          paddel2Y -= 6;
+        }
+      }
+
+      function ballRest() {
+        if(player1Score >= winningScore || player2Score >= winningScore) {
+          showScreenWin = true;
+        }
+        ballSpeedX = -ballSpeedX;
+        ballx = canvas.width / 2;
+        ballY = canvas.height / 2;
+      }
+
+      function mousePosition(e) {
+        let rect = canvas.getBoundingClientRect();
+        let root = document.documentElement;
+        let mouseX = e.clientX - rect.left - root.scrollLeft;
+        let mouseY = e.clientY - rect.top - root.scrollTop;
+
+        return {
+          x: mouseX,
+          y: mouseY
+        };
+      }
+
+      function move() {
+        if(showScreenWin) return;
+        
+        computermove();
+        ballx += ballSpeedX;
+        ballY += ballSpeedY;
+
+        // Ball collision with the left paddle
+        if (ballx < 0) {
+          if (ballY > paddel1Y && ballY < paddel1Y + paddelHeight) {
+            ballSpeedX = -ballSpeedX;
+            let deltay = ballY - (paddel1Y + paddelHeight / 2);
+            ballSpeedY = deltay * 0.35;
+
+            // Play the hit sound
+            paddleHitSound.play().catch((error) => {
+              console.error("Audio play error:", error);
+            });
+          } else {
+            player2Score++;
+            ballRest();
+          }
+        }
+
+        // Ball collision with the right paddle
+        if (ballx > canvas.width) {
+          if (ballY > paddel2Y && ballY < paddel2Y + paddelHeight) {
+            ballSpeedX = -ballSpeedX;
+            let deltay = ballY - (paddel2Y + paddelHeight / 2);
+            ballSpeedY = deltay * 0.35;
+
+            // Play the hit sound
+            paddleHitSound.play().catch((error) => {
+              console.error("Audio play error:", error);
+            });
+          } else {
+            player1Score++;
+            ballRest();
+          }
+        }
+
+        if (ballY > canvas.height || ballY < 0) {
+          ballSpeedY = -ballSpeedY;
+        }
+      }
+
+      function drawNet() {
+        for (let i = 0; i < canvas.height; i += 40) {
+          rectColor(canvas.width / 2 - 1, i, 2, 20, 'white');
+        }
+      }
+
+      function draw() {
+    // Clear the canvas
+    rectColor(0, 0, canvas.width, canvas.height, 'black');
+
+    // If a player has won, show the winning message
+    if (showScreenWin) {
+        canvasContext.font = "bold 36px Arial";
+        canvasContext.textAlign = "center";
+
+        // Check which player won and set color accordingly
+        if (player1Score >= winningScore) {
+            canvasContext.fillStyle = "green"; // Green color for left player win
+            canvasContext.fillText("Left Player Won", canvas.width / 2, canvas.height / 2 - 20);
+        } else {
+            canvasContext.fillStyle = "red"; // Default white color for right player win
+            canvasContext.fillText("Right Player Won", canvas.width / 2, canvas.height / 2 - 20);
+        }
+
+        // Display the restart prompt in a slightly smaller font
+        canvasContext.font = "24px Arial";
+        canvasContext.fillStyle = "lightgray";
+        canvasContext.fillText("Click Here to Start", canvas.width / 2, canvas.height / 2 + 40);
+
+        return;
+    }
+
+    // Draw the net, paddles, ball, and score if no one has won yet
+    drawNet();
+    rectColor(0, paddel1Y, paddleThickness, paddelHeight, 'white');
+    rectColor(canvas.width - paddleThickness, paddel2Y, paddleThickness, paddelHeight, 'white');
+    rectCircle(ballx, ballY, 15, 'white');
+    
+    // Set font for the score
+    canvasContext.font = "20px Arial";
+    canvasContext.fillStyle = "white";
+    canvasContext.fillText(player1Score, 100, 100);
+    canvasContext.fillText(player2Score, canvas.width - 100, 100);
+}
+
+
+      function rectCircle(centerx, centery, radius, drawColor) {
+        canvasContext.fillStyle = drawColor;
+        canvasContext.beginPath();
+        canvasContext.arc(centerx, centery, radius, 0, Math.PI * 2, true);
+        canvasContext.fill();
+      }
+
+      function rectColor(x, y, width, height, color) {
+        canvasContext.fillStyle = color;
+        canvasContext.fillRect(x, y, width, height);
+      }
+    </script>
+  </body>
+</html>
