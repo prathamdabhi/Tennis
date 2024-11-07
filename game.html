@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html>
   <head>
     <style>
@@ -9,8 +9,13 @@
         align-items: center;
         height: 100vh;
         margin: 0;
-        background-color: #f0f0f0;
+        background-color: rgba(0, 0, 0, 0.7); /* Dark background with 70% opacity */
+        /* Optional: Add a subtle background gradient or image */
+
+        /* Add a fallback color for older browsers */
+        background-color: #303030;
       }
+      
       #gameCanvas {
         border-radius: 15px;
         box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
@@ -19,6 +24,7 @@
     </style>
   </head>
   <body>
+    
     <canvas id="gameCanvas" width="800" height="600"></canvas>
     <script>
       let canvas;
@@ -152,43 +158,43 @@
       }
 
       function draw() {
-    // Clear the canvas
-    rectColor(0, 0, canvas.width, canvas.height, 'black');
+        // Clear the canvas
+        rectColor(0, 0, canvas.width, canvas.height, 'black');
 
-    // If a player has won, show the winning message
-    if (showScreenWin) {
-        canvasContext.font = "bold 36px Arial";
-        canvasContext.textAlign = "center";
+        // If a player has won, show the winning message
+        if (showScreenWin) {
+            canvasContext.font = "bold 36px Arial";
+            canvasContext.textAlign = "center";
 
-        // Check which player won and set color accordingly
-        if (player1Score >= winningScore) {
-            canvasContext.fillStyle = "green"; // Green color for left player win
-            canvasContext.fillText("Left Player Won", canvas.width / 2, canvas.height / 2 - 20);
-        } else {
-            canvasContext.fillStyle = "red"; // Default white color for right player win
-            canvasContext.fillText("Right Player Won", canvas.width / 2, canvas.height / 2 - 20);
+            // Check which player won and set color accordingly
+            if (player1Score >= winningScore) {
+                canvasContext.fillStyle = "green"; // Green color for left player win
+                canvasContext.fillText("Left Player Won", canvas.width / 2, canvas.height / 2 - 20);
+            } else {
+                canvasContext.fillStyle = "red"; // Default white color for right player win
+                canvasContext.fillText("Right Player Won", canvas.width / 2, canvas.height / 2 - 20);
+            }
+
+            // Display the restart prompt in a slightly smaller font
+            canvasContext.font = "24px Arial";
+            canvasContext.fillStyle = "lightgray";
+            canvasContext.fillText("Click Here to Start", canvas.width / 2, canvas.height / 2 + 40);
+
+            return;
         }
 
-        // Display the restart prompt in a slightly smaller font
-        canvasContext.font = "24px Arial";
-        canvasContext.fillStyle = "lightgray";
-        canvasContext.fillText("Click Here to Start", canvas.width / 2, canvas.height / 2 + 40);
-
-        return;
-    }
-
-    // Draw the net, paddles, ball, and score if no one has won yet
-    drawNet();
-    rectColor(0, paddel1Y, paddleThickness, paddelHeight, 'white');
-    rectColor(canvas.width - paddleThickness, paddel2Y, paddleThickness, paddelHeight, 'white');
-    rectCircle(ballx, ballY, 15, 'white');
-    
-    // Set font for the score
-    canvasContext.font = "20px Arial";
-    canvasContext.fillStyle = "white";
-    canvasContext.fillText(player1Score, 100, 100);
-    canvasContext.fillText(player2Score, canvas.width - 100, 100);
-}
+        // Draw the net, paddles, ball, and score if no one has won yet
+        drawNet();
+        rectColor(0, paddel1Y, paddleThickness, paddelHeight, 'white');
+        rectColor(canvas.width - paddleThickness, paddel2Y, paddleThickness, paddelHeight, 'white');
+        rectCircle(ballx, ballY, 15, 'white');
+        
+        // Set font for the score
+        canvasContext.font = "20px Arial";
+        canvasContext.fillStyle = "white";
+        canvasContext.fillText(player1Score, 100, 100);
+        canvasContext.fillText(player2Score, canvas.width - 100, 100);
+      }
 
 
       function rectCircle(centerx, centery, radius, drawColor) {
